@@ -1,6 +1,7 @@
 #include "AppDelegate.h"
 #include "HelloWorldScene.h"
 #include "FirstLayer.h"
+#include "PlayLayer.h"
 USING_NS_CC;
 using namespace std;
 AppDelegate::AppDelegate() {
@@ -27,7 +28,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
 	pEGLView->setDesignResolutionSize(1024, 768, kResolutionNoBorder);
 
     // create a scene. it's an autorelease object
-    CCScene *pScene = FirstLayer::scene();
+    CCScene *pScene = PlayLayer::scene();
 
     // run
     pDirector->runWithScene(pScene);
