@@ -22,14 +22,27 @@ public:
 	virtual void registerWithTouchDispatcher(void);
 	virtual bool init();  
 	void keyBackClicked();
-
+	void update(float delta);
 	
 	void initBeans();
 	void clearBeans(int row,int column);
-
+	void playBeanAnimation(CCSprite* sprite,int row,int column,bool left);
+	void spriteCallBack(CCNode* pSender, void* data);
+	bool isGameOver();
+	void gameOver();
+	void upadeTime();
+	void updateScore();
+	void showAddScoreAnimation(int score);
 	int mBeansArray[GAME_BLOCK_ROW_NUMBER][GAME_BLOCK_COLUMN_NUMBER];
 	CCLayer* mBeansLayer;
 	int mScore;
+	int mTime;
+	int mState;
+	CCSize mScreenSize;
+	UILabel *mTimeLabel;
+	UILabel *mScoreLabel;
+	CCLabelTTF *mScoreAnimation;
+	CCProgressTimer *mProgressTimer;
 };
 
 #endif
