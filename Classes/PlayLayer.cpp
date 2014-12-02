@@ -37,6 +37,8 @@ void PlayLayer::keyBackClicked()
 
 bool PlayLayer::init()
 {
+	mBestScore = getGameBestScore();
+	mSound = getSound();
 	CCSize size = CCDirector::sharedDirector()->getWinSize();
 	mScreenSize = size;
 	std::srand((unsigned int)time(0));
@@ -127,7 +129,7 @@ void PlayLayer::upadeTime()
 		t = 0;
 	char str[10];
 	memset(str,0,10);
-	sprintf_s(str,"time : %d",t);
+	sprintf(str,"time : %d",t);
 	mTimeLabel->setText(str);
 	int percent = (t)*100/60;
 	mProgressTimer->setPercentage(percent);  
@@ -137,8 +139,81 @@ void PlayLayer::updateScore()
 {
 	char str[10];
 	memset(str,0,10);
-	sprintf_s(str,"%d",mScore);
+	sprintf(str,"%d",mScore);
 	mScoreLabel->setText(str);
+}
+
+int PlayLayer::getGameBestScore()
+{
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+	JniMethodInfo t;
+	CCLOG("getData_ ==========  ");//com.laj.clickbeans
+	if (JniHelper::getMethodInfo(t, "com/laj/clickbeans/GameDataControl", "getBestScore", "()I")) {
+		jclass header_class = t.env->FindClass("com/laj/clickbeans/GameDataControl");
+		jmethodID init_id = t.env->GetStaticMethodID( header_class, "getInstance", "()Lcom/laj/clickbeans/GameDataControl;");
+		CCLOG("get best init_id = %d",init_id);
+		jobject header_object = t.env->CallStaticObjectMethod(header_class, init_id);
+		jmethodID getBestScoreID = t.env->GetMethodID(header_class,"getBestScore","()I");
+		int score = t.env->CallIntMethod(header_object,getBestScoreID);
+		CCLOG("get best score = %d",score);
+		return score;
+	}
+#endif
+	return 1111;
+}
+
+void PlayLayer::setGameBestScore(int score)
+{
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+	JniMethodInfo t;
+	CCLOG("getData_ ==========  ");
+	if (JniHelper::getMethodInfo(t, "com/laj/clickbeans/GameDataControl", "setBestScore", "(I)I")) {
+		jclass header_class = t.env->FindClass("com/laj/clickbeans/GameDataControl");
+		jmethodID init_id = t.env->GetStaticMethodID( header_class, "getInstance", "()Lcom/laj/clickbeans/GameDataControl;");
+		CCLOG("get best init_id = %d",init_id);
+		jobject header_object = t.env->CallStaticObjectMethod(header_class, init_id);
+		jmethodID getBestScoreID = t.env->GetMethodID(header_class,"setBestScore","(I)I");
+		t.env->CallIntMethod(header_object,getBestScoreID,score);
+		CCLOG("get best score = %d",score);
+	}
+#endif
+}
+
+int PlayLayer::getSound()
+{
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+	JniMethodInfo t;
+	CCLOG("getData_ ==========  ");
+	if (JniHelper::getMethodInfo(t, "com/laj/clickbeans/GameDataControl", "getSound", "()I")) {
+		jclass header_class = t.env->FindClass("com/laj/clickbeans/GameDataControl");
+		jmethodID init_id = t.env->GetStaticMethodID( header_class, "getInstance", "()Lcom/laj/clickbeans/GameDataControl;");
+		CCLOG("get best init_id = %d",init_id);
+		jobject header_object = t.env->CallStaticObjectMethod(header_class, init_id);
+		jmethodID getBestScoreID = t.env->GetMethodID(header_class,"getSound","()I");
+		int score = t.env->CallIntMethod(header_object,getBestScoreID);
+		CCLOG("get best score = %d",score);
+		return score;
+	}
+#endif
+	return 1;
+}
+
+
+void PlayLayer::setSound(int score)
+{
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+	JniMethodInfo t;
+	CCLOG("getData_ ==========  ");
+	if (JniHelper::getMethodInfo(t, "com/laj/clickbeans/GameDataControl", "setSound", "(I)I")) {
+		jclass header_class = t.env->FindClass("com/laj/clickbeans/GameDataControl");
+		jmethodID init_id = t.env->GetStaticMethodID( header_class, "getInstance", "()Lcom/laj/clickbeans/GameDataControl;");
+		CCLOG("get best init_id = %d",init_id);
+		jobject header_object = t.env->CallStaticObjectMethod(header_class, init_id);
+		jmethodID getBestScoreID = t.env->GetMethodID(header_class,"setSound","(I)I");
+		t.env->CallIntMethod(header_object,getBestScoreID,score);
+		CCLOG("get best score = %d",score);
+	}
+#endif
 }
 
 void PlayLayer::initBeans()
@@ -173,7 +248,7 @@ void PlayLayer::initBeans()
 				//bean->setPosition(ccp(column * GAME_BLOCK_WIDTH + GAME_BLOCK_WIDTH/2 + ROW_PX,row * GAME_BLOCK_HEIGHT + GAME_BLOCK_HEIGHT/2 + COLUMN_PX));
 				CCLOG("row = %d,column = %d",row,column);
 				addChild(bean);
-				CCMoveTo *moveTo = CCMoveTo::create(1,ccp(column * GAME_BLOCK_WIDTH + GAME_BLOCK_WIDTH/2 + ROW_PX,row * GAME_BLOCK_HEIGHT + GAME_BLOCK_HEIGHT/2 + COLUMN_PX));
+				CCMoveTo *moveTo = CCMoveTo::create(0.5,ccp(column * GAME_BLOCK_WIDTH + GAME_BLOCK_WIDTH/2 + ROW_PX,row * GAME_BLOCK_HEIGHT + GAME_BLOCK_HEIGHT/2 + COLUMN_PX));
 				bean->runAction(moveTo);
 				break;
 			}
@@ -225,6 +300,10 @@ void PlayLayer::ccTouchEnded(cocos2d::CCTouch *pTouch, cocos2d::CCEvent *pEvent)
 void PlayLayer::gameOver()
 {
 	gGameScore = mScore;
+	if(gGameScore > mBestScore)
+	{
+		setGameBestScore(gGameScore);
+	}
 	CCScene *scene = GameOver::scene();
 	CCTransitionScene *tScene = Util::createSceneAnimaion(SCENE_RADIA_CCW,scene);
 	CCDirector::sharedDirector()->replaceScene(tScene);

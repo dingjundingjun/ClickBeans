@@ -10,13 +10,13 @@ using namespace gui;
 using namespace cocos2d::extension;
 
 #define GAME_BLOCK_ROW_NUMBER 13
-#define GAME_BLOCK_COLUMN_NUMBER 24
-#define GAME_BLOCK_WIDTH 38
-#define GAME_BLOCK_HEIGHT 38
+#define GAME_BLOCK_COLUMN_NUMBER 23
+#define GAME_BLOCK_WIDTH 40
+#define GAME_BLOCK_HEIGHT 40
 #define BEANS_NUMBER 200
 #define BEANS_TAG 1000
-#define ROW_PX 55
-#define COLUMN_PX 55
+#define ROW_PX 50
+#define COLUMN_PX 41
 #define BEANS_CLEAR 1000
 #define GAME_TIME 3600
 #define GAME_WAIT 0

@@ -8,7 +8,9 @@
 USING_NS_CC;
 USING_NS_CC_EXT;
 using namespace gui;
-
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+#include "platform/android/jni/JniHelper.h"
+#endif
 class PlayLayer : public cocos2d::CCLayer
 {
 public:
@@ -33,11 +35,17 @@ public:
 	void upadeTime();
 	void updateScore();
 	void showAddScoreAnimation(int score);
+	int getGameBestScore();
+	void setGameBestScore(int score);
+	void setSound(int score);
+	int getSound();
 	int mBeansArray[GAME_BLOCK_ROW_NUMBER][GAME_BLOCK_COLUMN_NUMBER];
 	CCLayer* mBeansLayer;
 	int mScore;
 	int mTime;
 	int mState;
+	int mBestScore;
+	int mSound;
 	CCSize mScreenSize;
 	UILabel *mTimeLabel;
 	UILabel *mScoreLabel;
