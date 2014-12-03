@@ -39,6 +39,11 @@ public:
 	void setGameBestScore(int score);
 	void setSound(int score);
 	int getSound();
+	void playBeginAnimation();
+	void beginCallBack();
+	void switchStart(CCObject *obj,TouchEventType type);
+	void switchInfo(CCObject *obj,TouchEventType type);
+	void showResult();
 	int mBeansArray[GAME_BLOCK_ROW_NUMBER][GAME_BLOCK_COLUMN_NUMBER];
 	CCLayer* mBeansLayer;
 	int mScore;
@@ -51,6 +56,19 @@ public:
 	UILabel *mScoreLabel;
 	CCLabelTTF *mScoreAnimation;
 	CCProgressTimer *mProgressTimer;
+	CCLayer *mBeginLayer;
+	CCLayer *mRestartlayer;
+	CCSprite *mBeginSprite;
+	CCSprite *mRestartSprite;
+
+	UIButton *mStartBtn;
+	UIButton *mInfoBtn;
+	UILayer *mBeginUIlayer;
+
+	UIButton *mReStartBtn;
+	UILayer *mRestartUIlayer;
+	UILabel *mBestScoreLabel;
+	UILabel *mCurrentScoreLabel;
 };
 
 #endif

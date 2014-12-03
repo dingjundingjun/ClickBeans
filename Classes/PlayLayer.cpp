@@ -44,6 +44,55 @@ bool PlayLayer::init()
 	std::srand((unsigned int)time(0));
 	setTouchEnabled( true );
 	this->setKeypadEnabled(true);
+
+	mBeginLayer = CCLayer::create();
+	mBeginSprite = CCSprite::create("begin_layer.png");
+	this->addChild(mBeginLayer,1000);
+	mBeginLayer->addChild(mBeginSprite);
+	mBeginLayer->setPosition(ccp(0,size.height + mBeginLayer->getContentSize().height));
+	mBeginSprite->setPosition(ccp(size.width/2,size.height/2));
+	mBeginUIlayer = UILayer::create();
+	mStartBtn = Util::createUIButton("start_game.png","start_game_press.png");
+	mStartBtn->addTouchEventListener(mBeginLayer,toucheventselector(PlayLayer::switchStart));
+	mStartBtn->setPosition(ccp(size.width/2,size.height/2 + 10));
+	mBeginUIlayer->addWidget(mStartBtn);
+	mInfoBtn = Util::createUIButton("game_info.png","game_info_press.png");
+	mInfoBtn->addTouchEventListener(mBeginLayer,toucheventselector(PlayLayer::switchInfo));
+	mInfoBtn->setPosition(ccp(size.width/2,size.height/2 - 100));
+	mBeginUIlayer->addWidget(mInfoBtn);
+	mBeginLayer->addChild(mBeginUIlayer);
+
+	mRestartlayer = CCLayer::create();
+	mRestartSprite = CCSprite::create("restart_layer.png");
+	this->addChild(mRestartlayer,1001);
+	mRestartlayer->addChild(mRestartSprite);
+	mRestartlayer->setPosition(ccp(0,size.height + mRestartlayer->getContentSize().height));
+	mRestartSprite->setPosition(ccp(size.width/2,size.height/2));
+	mRestartUIlayer = UILayer::create();
+	mReStartBtn = Util::createUIButton("restart_btn.png","restart_btn_press.png");
+	mReStartBtn->addTouchEventListener(mRestartlayer,toucheventselector(PlayLayer::switchStart));
+	mReStartBtn->setPosition(ccp(size.width/2,size.height/2 - 120));
+	mRestartUIlayer->addWidget(mReStartBtn);
+	mRestartlayer->addChild(mRestartUIlayer);
+
+	ccColor3B color;
+	color.b = 0;
+	color.g = 0;
+	color.r = 255;
+	mBestScoreLabel = UILabel::create();
+	mBestScoreLabel->setFontSize(40);
+	mBestScoreLabel->setText("100");
+	mBestScoreLabel->setColor(color);
+	mBestScoreLabel->setPosition(ccp(size.width/2,size.height/2 - 50));
+	mRestartlayer->addChild(mBestScoreLabel,100);
+
+	mCurrentScoreLabel = UILabel::create();
+	mCurrentScoreLabel->setFontSize(40);
+	mCurrentScoreLabel->setText("100");
+	mCurrentScoreLabel->setColor(color);
+	mCurrentScoreLabel->setPosition(ccp(size.width/2,size.height/2 + 20 ));
+	mRestartlayer->addChild(mCurrentScoreLabel,100);
+
 	CCSprite *bgSprite = CCSprite::create("bg.png");
 	bgSprite->setAnchorPoint(ccp(0,0));
 	this->addChild(bgSprite);
@@ -80,12 +129,73 @@ bool PlayLayer::init()
 	mScoreLabel->setText("0");
 	mScoreLabel->setPosition(ccp(750,progressBg->getPosition().y));
 	this->addChild(mScoreLabel,100);
-	initBeans();
+	//initBeans();
 	scheduleUpdate();
-	
+	playBeginAnimation();
 	mScoreAnimation = CCLabelTTF::create("0","Marker Felt",60);
 	this->addChild(mScoreAnimation);
+
 	return true;
+}
+
+void PlayLayer::switchStart(CCObject *obj,TouchEventType type)
+{
+	
+	switch (type)
+	{
+	case TouchEventType::TOUCH_EVENT_ENDED:
+		{
+			CCLOG("switch start");
+			beginCallBack();
+			break;
+		}
+	}
+}
+
+void PlayLayer::switchInfo(CCObject *obj,TouchEventType type)
+{
+	switch (type)
+	{
+	case TouchEventType::TOUCH_EVENT_ENDED:
+	{
+		CCLOG("switch Info");
+		break;
+	}
+	}
+}
+
+void PlayLayer::beginCallBack()
+{
+	CCActionInterval *moTo = CCMoveTo::create(0.5,ccp(0,CCDirector::sharedDirector()->getWinSize().height));
+	CCActionInterval *action = CCSequence::create(moTo,CCCallFunc::create((PlayLayer*)getParent(),callfunc_selector(PlayLayer::initBeans)),NULL);
+	runAction(action);
+}
+
+void PlayLayer::playBeginAnimation()
+{
+	CCActionInterval *move = CCMoveTo::create(0.5, ccp(0,0));
+	CCActionInterval* jumpto = CCJumpBy ::create(0.5, ccp(0, 0), 100, 1 );
+	CCActionInterval *action = CCSequence::create(move,jumpto,NULL);
+	mBeginLayer->runAction(action);
+}
+
+void PlayLayer::showResult()
+{
+
+	char str[10];
+	memset(str,0,10);
+	sprintf(str,"%d",mBestScore);
+	mBestScoreLabel->setText(str);
+
+	char str1[10];
+	memset(str1,0,10);
+	sprintf(str1,"%d",mScore);
+	mCurrentScoreLabel->setText(str1);
+
+	CCActionInterval *move = CCMoveTo::create(0.5, ccp(0,0));
+	CCActionInterval* jumpto = CCJumpBy ::create(0.5, ccp(0, 0), 100, 1 );
+	CCActionInterval *action = CCSequence::create(move,jumpto,NULL);
+	mRestartlayer->runAction(action);
 }
 
 void PlayLayer::update(float delta)
@@ -159,7 +269,7 @@ int PlayLayer::getGameBestScore()
 		return score;
 	}
 #endif
-	return 1111;
+	return 0;
 }
 
 void PlayLayer::setGameBestScore(int score)
@@ -224,11 +334,13 @@ void PlayLayer::initBeans()
 	int j = 0;
 	int p = 0;
 	mScore = 0;
+	updateScore();
 	for(i = 0 ; i < GAME_BLOCK_ROW_NUMBER;i++)
 	{
 		for(j = 0;j < GAME_BLOCK_COLUMN_NUMBER;j++)
 		{
 			mBeansArray[i][j] = -1;
+			removeChildByTag(i*100 + j);
 		}
 	}
 	for(p = 0; p < BEANS_NUMBER;p++)
@@ -299,14 +411,17 @@ void PlayLayer::ccTouchEnded(cocos2d::CCTouch *pTouch, cocos2d::CCEvent *pEvent)
 
 void PlayLayer::gameOver()
 {
+	mState = GAME_WAIT;
 	gGameScore = mScore;
 	if(gGameScore > mBestScore)
 	{
+		mBestScore = gGameScore;
 		setGameBestScore(gGameScore);
 	}
-	CCScene *scene = GameOver::scene();
+	/*CCScene *scene = GameOver::scene();
 	CCTransitionScene *tScene = Util::createSceneAnimaion(SCENE_RADIA_CCW,scene);
-	CCDirector::sharedDirector()->replaceScene(tScene);
+	CCDirector::sharedDirector()->replaceScene(tScene);*/
+	showResult();
 }
 
 bool PlayLayer::isGameOver()
