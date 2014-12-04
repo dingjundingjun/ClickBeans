@@ -22,6 +22,7 @@ using namespace cocos2d::extension;
 #define GAME_WAIT 0
 #define GAME_START 1
 #define GAME_END 2
+#define GAME_EXPLAIN 3
 
 #define SCENE_JUMP 0
 #define SCENE_RADIA_CCW 1

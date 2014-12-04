@@ -43,7 +43,9 @@ public:
 	void beginCallBack();
 	void switchStart(CCObject *obj,TouchEventType type);
 	void switchInfo(CCObject *obj,TouchEventType type);
+	void switExplain(CCObject *obj,TouchEventType type);
 	void showResult();
+	void showExplain(bool bShow);
 	int mBeansArray[GAME_BLOCK_ROW_NUMBER][GAME_BLOCK_COLUMN_NUMBER];
 	CCLayer* mBeansLayer;
 	int mScore;
@@ -63,6 +65,7 @@ public:
 
 	UIButton *mStartBtn;
 	UIButton *mInfoBtn;
+	CCSprite *mExplainSprite;
 	UILayer *mBeginUIlayer;
 
 	UIButton *mReStartBtn;

@@ -57,9 +57,11 @@ bool PlayLayer::init()
 	mStartBtn->setPosition(ccp(size.width/2,size.height/2 + 10));
 	mBeginUIlayer->addWidget(mStartBtn);
 	mInfoBtn = Util::createUIButton("game_info.png","game_info_press.png");
-	mInfoBtn->addTouchEventListener(mBeginLayer,toucheventselector(PlayLayer::switchInfo));
+	mInfoBtn->addTouchEventListener(this,toucheventselector(PlayLayer::switchInfo));
 	mInfoBtn->setPosition(ccp(size.width/2,size.height/2 - 100));
 	mBeginUIlayer->addWidget(mInfoBtn);
+
+	
 	mBeginLayer->addChild(mBeginUIlayer);
 
 	mRestartlayer = CCLayer::create();
@@ -83,14 +85,14 @@ bool PlayLayer::init()
 	mBestScoreLabel->setFontSize(40);
 	mBestScoreLabel->setText("100");
 	mBestScoreLabel->setColor(color);
-	mBestScoreLabel->setPosition(ccp(size.width/2,size.height/2 - 50));
+	mBestScoreLabel->setPosition(ccp(size.width/2 + 30,size.height/2 - 40));
 	mRestartlayer->addChild(mBestScoreLabel,100);
 
 	mCurrentScoreLabel = UILabel::create();
 	mCurrentScoreLabel->setFontSize(40);
 	mCurrentScoreLabel->setText("100");
 	mCurrentScoreLabel->setColor(color);
-	mCurrentScoreLabel->setPosition(ccp(size.width/2,size.height/2 + 20 ));
+	mCurrentScoreLabel->setPosition(ccp(size.width/2 + 30,size.height/2 + 30 ));
 	mRestartlayer->addChild(mCurrentScoreLabel,100);
 
 	CCSprite *bgSprite = CCSprite::create("bg.png");
@@ -138,6 +140,26 @@ bool PlayLayer::init()
 	return true;
 }
 
+void PlayLayer::showExplain(bool bShow)
+{
+	if(bShow)
+	{
+		mExplainSprite = CCSprite::create("game_explain.png");
+		mExplainSprite->setPosition(ccp(mScreenSize.width/2,mScreenSize.height/2));
+		this->addChild(mExplainSprite,1011,111);
+		mState = GAME_EXPLAIN;
+	}
+	else
+	{
+		if(mState == GAME_EXPLAIN)
+		{
+			this->removeChildByTag(111);
+			mState = GAME_WAIT;
+		}
+		
+	}
+}
+
 void PlayLayer::switchStart(CCObject *obj,TouchEventType type)
 {
 	
@@ -145,8 +167,11 @@ void PlayLayer::switchStart(CCObject *obj,TouchEventType type)
 	{
 	case TOUCH_EVENT_ENDED:
 		{
-			CCLOG("switch start");
-			beginCallBack();
+			if(((PlayLayer*)getParent())->mState == GAME_WAIT)
+			{
+				CCLOG("switch start");
+				beginCallBack();
+			}
 			break;
 		}
 	}
@@ -158,7 +183,11 @@ void PlayLayer::switchInfo(CCObject *obj,TouchEventType type)
 	{
 	case TOUCH_EVENT_ENDED:
 	{
-		CCLOG("switch Info");
+		if(mState == GAME_WAIT)
+		{
+			CCLOG("switch Info");
+			showExplain(true);
+		}
 		break;
 	}
 	}
@@ -380,6 +409,11 @@ void PlayLayer::ccTouchMoved(cocos2d::CCTouch *pTouch, cocos2d::CCEvent *pEvent)
 
 void PlayLayer::ccTouchEnded(cocos2d::CCTouch *pTouch, cocos2d::CCEvent *pEvent)
 {
+	if(mState == GAME_EXPLAIN)
+	{
+		showExplain(false);
+		return;
+	}
 	if(mState != GAME_START)
 	{
 		return;
