@@ -143,7 +143,7 @@ void PlayLayer::switchStart(CCObject *obj,TouchEventType type)
 	
 	switch (type)
 	{
-	case TouchEventType::TOUCH_EVENT_ENDED:
+	case TOUCH_EVENT_ENDED:
 		{
 			CCLOG("switch start");
 			beginCallBack();
@@ -156,7 +156,7 @@ void PlayLayer::switchInfo(CCObject *obj,TouchEventType type)
 {
 	switch (type)
 	{
-	case TouchEventType::TOUCH_EVENT_ENDED:
+	case TOUCH_EVENT_ENDED:
 	{
 		CCLOG("switch Info");
 		break;
