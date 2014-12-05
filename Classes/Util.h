@@ -16,7 +16,7 @@ using namespace cocos2d::extension;
 #define BEANS_NUMBER 200
 #define BEANS_TAG 1000
 #define ROW_PX 50
-#define COLUMN_PX 41
+#define COLUMN_PX 71
 #define BEANS_CLEAR 1000
 #define GAME_TIME 3600
 #define GAME_WAIT 0

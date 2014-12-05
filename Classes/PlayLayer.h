@@ -38,6 +38,7 @@ public:
 	int getGameBestScore();
 	void setGameBestScore(int score);
 	void setSound(int score);
+	void showInset();
 	int getSound();
 	void playBeginAnimation();
 	void beginCallBack();
@@ -72,6 +73,8 @@ public:
 	UILayer *mRestartUIlayer;
 	UILabel *mBestScoreLabel;
 	UILabel *mCurrentScoreLabel;
+
+	int mPlayTimes;
 };
 
 #endif

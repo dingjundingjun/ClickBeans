@@ -37,6 +37,7 @@ void PlayLayer::keyBackClicked()
 
 bool PlayLayer::init()
 {
+	mPlayTimes = 0;
 	mBestScore = getGameBestScore();
 	mSound = getSound();
 	CCSize size = CCDirector::sharedDirector()->getWinSize();
@@ -99,11 +100,11 @@ bool PlayLayer::init()
 	bgSprite->setAnchorPoint(ccp(0,0));
 	this->addChild(bgSprite);
 	CCSprite *bgSprite2 = CCSprite::create("bg2.png");
-	bgSprite2->setPosition(ccp(size.width/2,size.height/2 - 50));
+	bgSprite2->setPosition(ccp(size.width/2,size.height/2 - 20));
 	this->addChild(bgSprite2);
 
 	CCSprite *progressBg = CCSprite::create("progress_bg.png");
-	progressBg->setPosition(ccp(size.width/2,size.height-progressBg->getContentSize().height/2 - 20));
+	progressBg->setPosition(ccp(size.width/2,size.height-progressBg->getContentSize().height/2));
 	this->addChild(progressBg);
 
 	CCSprite *progressbgSprite=CCSprite::create("progress.png");  
@@ -210,7 +211,6 @@ void PlayLayer::playBeginAnimation()
 
 void PlayLayer::showResult()
 {
-
 	char str[10];
 	memset(str,0,10);
 	sprintf(str,"%d",mBestScore);
@@ -225,6 +225,30 @@ void PlayLayer::showResult()
 	CCActionInterval* jumpto = CCJumpBy ::create(0.5, ccp(0, 0), 100, 1 );
 	CCActionInterval *action = CCSequence::create(move,jumpto,NULL);
 	mRestartlayer->runAction(action);
+
+	mPlayTimes++;
+	if(mPlayTimes%3 == 0)
+	{
+		showInset();
+	}
+
+}
+
+void PlayLayer::showInset()
+{
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+	JniMethodInfo t;
+	CCLOG("getData_ ==========  ");//com.laj.clickbeans
+	if (JniHelper::getMethodInfo(t, "com/laj/clickbeans/GameDataControl", "showInset", "()I")) {
+		jclass header_class = t.env->FindClass("com/laj/clickbeans/GameDataControl");
+		jmethodID init_id = t.env->GetStaticMethodID( header_class, "getInstance", "()Lcom/laj/clickbeans/GameDataControl;");
+		CCLOG("get best init_id = %d",init_id);
+		jobject header_object = t.env->CallStaticObjectMethod(header_class, init_id);
+		jmethodID getBestScoreID = t.env->GetMethodID(header_class,"showInset","()I");
+		t.env->CallIntMethod(header_object,getBestScoreID);
+		return;
+	}
+#endif
 }
 
 void PlayLayer::update(float delta)
@@ -268,7 +292,7 @@ void PlayLayer::upadeTime()
 		t = 0;
 	char str[10];
 	memset(str,0,10);
-	sprintf(str,"time : %d",t);
+	sprintf(str,"time:%d",t);
 	mTimeLabel->setText(str);
 	int percent = (t)*100/60;
 	mProgressTimer->setPercentage(percent);  
